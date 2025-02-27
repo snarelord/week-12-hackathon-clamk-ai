@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function Home() {
   const [text, setText] = useState("");
-  const [numResults, setNumResults] = useState("5"); // Add state for number of results
+  const [numResults, setNumResults] = useState(3); // Add state for number of results
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -58,15 +58,15 @@ export default function Home() {
   };
 
   const MovieCard = ({ movie }) => (
-    <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+    <div className="group bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-xl relative z-10 hover:z-20">
       <div className="relative">
         {movie.rated && (
-          <span className="absolute top-2 right-2 bg-black/60 px-2 py-1 rounded text-xs font-medium">
+          <span className="absolute top-16 right-2 bg-black/60 px-2 py-1 rounded text-xs font-medium">
             {movie.rated}
           </span>
         )}
         {movie.imdbRating && (
-          <div className="absolute bottom-2 right-2 bg-yellow-500/90 px-2 py-1 rounded text-xs font-bold text-black">
+          <div className=" bottom-2 right-2 bg-yellow-500/90 px-2 py-1 rounded text-xs font-bold text-black">
             ⭐ {movie.imdbRating}/10
           </div>
         )}
@@ -97,7 +97,9 @@ export default function Home() {
           </p>
         )}
 
-        <p className="text-sm text-gray-300 mb-2 line-clamp-3">{movie.plot}</p>
+        <p className="text-sm text-gray-300 mb-2 line-clamp-3 group-hover:line-clamp-none transition-height duration-300 overflow-hidden">
+          {movie.plot}
+        </p>
 
         {movie.score && (
           <div className="mt-2 pt-2 border-t border-gray-700">
@@ -116,18 +118,25 @@ export default function Home() {
         <h1 className="text-3xl font-bold mb-6 text-center">
           🎬 Movie Recommendation Library
         </h1>
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-center mb-2">Step 1: Add Movies</h2>
-        <p className="font-bold text-center mb-4">
-          Type in a movie title. Click the 'Save my Movies' button and we will search for and store the movies with related titles.
-        </p>
-      </div>
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-center mb-2">Step 2: Get Recommendations</h2>
-        <p className="font-bold text-center mb-4">
-          When you want to make your choice, type in what your in the mood for, genre, year, or even just a key word and get your personalised recommendation!
-        </p>
-      </div>
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-center mb-2">
+            Step 1: Add Movies
+          </h2>
+          <p className="font-bold text-center mb-4">
+            Type in a movie title. Click the 'Save my Movies' button and we will
+            search for and store the movies with related titles.
+          </p>
+        </div>
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-center mb-2">
+            Step 2: Get Recommendations
+          </h2>
+          <p className="font-bold text-center mb-4">
+            When you want to make your choice, type in what your in the mood
+            for, genre, year, or even just a key word and get your personalised
+            recommendation!
+          </p>
+        </div>
         <div className="max-w-md mx-auto mb-8">
           <div className="flex gap-4 mb-4">
             <input
@@ -145,10 +154,11 @@ export default function Home() {
             <select
               className="p-2 rounded bg-gray-800 border border-gray-700 text-white"
               value={numResults}
-              onChange={(e) => setNumResults(e.target.value)}
+              onChange={(e) => setNumResults(Number(e.target.value))}
             >
-              <option value="5">5 Results</option>
+              <option value="3">3 Results</option>
               <option value="10">10 Results</option>
+              <option value="15">15 Results</option>
             </select>
           </div>
 
