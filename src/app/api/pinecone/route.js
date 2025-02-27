@@ -25,29 +25,75 @@ async function getEmbedding(text) {
   return response.data.data[0].embedding;
 }
 
-async function fetchMovieData(movieTitle) {
+// Function to search movies from OMDB API
+async function searchMovies(query) {
   const response = await fetch(
-    `http://www.omdbapi.com/?t=${encodeURIComponent(movieTitle)}&apikey=${
+    `http://www.omdbapi.com/?s=${encodeURIComponent(query)}&apikey=${
       process.env.OMDB_API_KEY
     }`
   );
   const data = await response.json();
-  console.log("----------------------");
   console.log(data);
-  console.log("----------------------");
+
   if (data.Response === "True") {
-    return data.Plot;
-  } else {
-    throw new Error("Movie not found");
+    return data.Search.slice(0, 5); // Get first 5 movies
   }
+  throw new Error("No movies found");
+}
+
+// Update the fetchMovieDetails function to include the specific fields
+async function fetchMovieDetails(imdbId) {
+  const response = await fetch(
+    `http://www.omdbapi.com/?i=${imdbId}&apikey=${process.env.OMDB_API_KEY}`
+  );
+  const data = await response.json();
+
+  if (data.Response === "True") {
+    return {
+      title: data.Title,
+      year: data.Year,
+      rated: data.Rated,
+      plot: data.Plot,
+      genre: data.Genre,
+      director: data.Director,
+      imdbRating: data.imdbRating,
+      imdbId: data.imdbID,
+    };
+  }
+  throw new Error(`Movie details not found for ID: ${imdbId}`);
+}
+
+// Update the storeMovieInPinecone function to include the new fields
+async function storeMovieInPinecone(movieData) {
+  const movieDescription = `${movieData.title} (${movieData.year}). ${movieData.plot} 
+    Directed by ${movieData.director}. Genres: ${movieData.genre}. Rated ${movieData.rated}. IMDB Rating: ${movieData.imdbRating}/10`;
+
+  const embedding = await getEmbedding(movieDescription);
+
+  await index.upsert([
+    {
+      id: movieData.imdbId,
+      values: embedding,
+      metadata: {
+        title: movieData.title,
+        year: movieData.year,
+        rated: movieData.rated,
+        plot: movieData.plot,
+        genre: movieData.genre,
+        director: movieData.director,
+        imdbRating: movieData.imdbRating,
+        description: movieDescription,
+      },
+    },
+  ]);
+
+  return movieData;
 }
 
 export async function POST(req) {
   try {
-    // Add error handling for JSON parsing
-    const body = await req.text(); // Get raw request body as text
+    const body = await req.text();
 
-    // Check if body is empty
     if (!body) {
       return NextResponse.json(
         { error: "Request body is empty" },
@@ -55,7 +101,6 @@ export async function POST(req) {
       );
     }
 
-    // Try to parse the JSON
     let parsedBody;
     try {
       parsedBody = JSON.parse(body);
@@ -66,9 +111,8 @@ export async function POST(req) {
       );
     }
 
-    const { text, action } = parsedBody;
+    const { text, action, numResults = 25 } = parsedBody; // Add numResults parameter with default value
 
-    // Validate required fields
     if (!text) {
       return NextResponse.json(
         { error: "Missing required field: text" },
@@ -85,29 +129,33 @@ export async function POST(req) {
 
     if (action === "store") {
       try {
-        // Fetch movie data from OMDb API
-        const movieDescription = await fetchMovieData(text);
+        // Search for movies related to the query
+        const movies = await searchMovies(text);
+        const storedMovies = [];
 
-        // Generate embedding for movie description
-        const embedding = await getEmbedding(movieDescription);
-
-        // Store the movie in Pinecone with updated API
-        await index.upsert([
-          {
-            id: Date.now().toString(),
-            values: embedding,
-            metadata: { title: text, description: movieDescription },
-          },
-        ]);
+        // Fetch details and store each movie
+        for (const movie of movies) {
+          try {
+            const movieDetails = await fetchMovieDetails(movie.imdbID);
+            const storedMovie = await storeMovieInPinecone(movieDetails);
+            storedMovies.push(storedMovie);
+          } catch (error) {
+            console.error(`Error processing movie ${movie.Title}:`, error);
+            // Continue with other movies even if one fails
+          }
+        }
 
         return NextResponse.json(
-          { message: "Movie stored successfully!" },
+          {
+            message: `Successfully stored ${storedMovies.length} movies!`,
+            movies: storedMovies,
+          },
           { status: 200 }
         );
       } catch (error) {
-        console.error("Error storing movie:", error);
+        console.error("Error storing movies:", error);
         return NextResponse.json(
-          { error: `Failed to fetch or store movie: ${error.message}` },
+          { error: `Failed to fetch or store movies: ${error.message}` },
           { status: 500 }
         );
       }
@@ -115,20 +163,24 @@ export async function POST(req) {
 
     if (action === "search") {
       try {
-        // Generate embedding for the query
         const queryEmbedding = await getEmbedding(text);
 
-        // Updated query format for Pinecone v5
+        // Use the numResults parameter in the query
         const results = await index.query({
           vector: queryEmbedding,
-          topK: 5,
+          topK: Number.parseInt(numResults), // Convert to integer and use in query
           includeMetadata: true,
         });
 
         return NextResponse.json(
           results.matches.map((match) => ({
-            title: match.metadata.title || "Unknown Title",
-            description: match.metadata.description,
+            title: match.metadata.title,
+            year: match.metadata.year,
+            rated: match.metadata.rated,
+            plot: match.metadata.plot,
+            genre: match.metadata.genre,
+            director: match.metadata.director,
+            imdbRating: match.metadata.imdbRating,
             score: match.score,
           })),
           { status: 200 }
