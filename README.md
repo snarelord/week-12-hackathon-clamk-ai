@@ -1,6 +1,6 @@
-# Movie Recommendation Engine
+# Movie Recommendations Library
 
-🎬 A Movie Recommendation Engine built with Next.js, Pinecone, and OpenAI embeddings that provides personalised movie suggestions based on user input.
+🎬 A Movie Recommendations Library built with Next.js, Pinecone, and OpenAI embeddings that provides personalised movie suggestions based on user input.
 
 ## Table of Contents
 
@@ -9,9 +9,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
-- [Environment Variables](#environment-variables)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Features
 
