@@ -9,9 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@pinecone-database/pinecone": "^1.0.0",
+    "@pinecone-database/pinecone": "^5.0.2",
     "dotenv": "^16.4.7",
     "next": "15.2.0",
+    "node-fetch": "^3.3.2",
     "openai": "^3.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
