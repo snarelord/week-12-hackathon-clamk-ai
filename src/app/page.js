@@ -123,7 +123,7 @@ export default function Home() {
             Step 1: Add Movies
           </h2>
           <p className="font-bold text-center mb-4">
-            Type in a movie title. Click the 'Save my Movies' button and we will
+            Type in a movie title. Click the Save my Movies button and we will
             search for and store the movies with related titles.
           </p>
         </div>
@@ -131,9 +131,10 @@ export default function Home() {
           <h2 className="text-xl font-bold text-center mb-2">
             Step 2: Get Recommendations
           </h2>
+          {/* // eslint-disable-next-line react/no-unescaped-entities */}
           <p className="font-bold text-center mb-4">
             When you want to make your choice, type in what your in the mood
-            for, genre, year, or even just a key word and get your personalised
+            for, genre, year, or even just a key word and get your personalized
             recommendation!
           </p>
         </div>
