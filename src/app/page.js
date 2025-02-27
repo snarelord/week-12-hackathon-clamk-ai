@@ -111,18 +111,29 @@ export default function Home() {
   );
 
   return (
-    <div className="min-h-screen p-10 bg-gray-900 text-white">
+    <div className="min-h-screen p-10 bg-cyan-700 text-slate-100">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-center">
-          🎬 Movie Recommendation Engine
+          🎬 Movie Recommendation Library
         </h1>
-
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-center mb-2">Step 1: Add Movies</h2>
+        <p className="font-bold text-center mb-4">
+          Type in a movie title. Click the 'Save my Movies' button and we will search for and store the movies with related titles.
+        </p>
+      </div>
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-center mb-2">Step 2: Get Recommendations</h2>
+        <p className="font-bold text-center mb-4">
+          When you want to make your choice, type in what your in the mood for, genre, year, or even just a key word and get your personalised recommendation!
+        </p>
+      </div>
         <div className="max-w-md mx-auto mb-8">
           <div className="flex gap-4 mb-4">
             <input
               className="flex-1 p-2 rounded bg-gray-800 border border-gray-700 text-white"
               type="text"
-              placeholder="Enter a movie title..."
+              placeholder="Search here..."
               value={text}
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => {
@@ -151,7 +162,7 @@ export default function Home() {
               onClick={() => handleSubmit("store")}
               disabled={loading || !text.trim()}
             >
-              {loading ? "Processing..." : "Store Similar Movies"}
+              {loading ? "Processing..." : "Save my Movies"}
             </button>
             <button
               className={`px-4 py-2 bg-green-500 rounded flex-1 ${
