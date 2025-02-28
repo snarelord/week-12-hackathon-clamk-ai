@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
+import { useRef } from "react";
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -111,7 +113,106 @@ export default function Home() {
       </div>
     </div>
   );
-
+  const VerticalScrollingImageBelt = ({ className, scrollSpeed }) => {
+    const beltRef = useRef(null);
+    const [beltHeight, setBeltHeight] = useState(0);
+    const images = [
+      {
+        id: 1,
+        src: "/inception.jpg",
+        alt: "Custom image 1",
+      },
+      {
+        id: 2,
+        src: "/harrypotter.jpg",
+        alt: "Custom image 2",
+      },
+      {
+        id: 3,
+        src: "/us.jpg",
+        alt: "Custom image 3",
+      },
+      {
+        id: 4,
+        src: "/starwars.jpg",
+        alt: "Custom image 4",
+      },
+      {
+        id: 5,
+        src: "/grandbudapesthotel.jpg",
+        alt: "Custom image 4",
+      },
+    ];
+    // 3x array of images so they repeat before looping
+    // can remove with enough images if they don't need to repeat
+    const extendedImages = [...images, ...images, ...images];
+    useEffect(() => {
+      const belt = beltRef.current;
+      if (!belt || belt.children.length === 0) return;
+      // total height
+      let totalHeight = 0;
+      const items = Array.from(belt.children);
+      const calculateHeights = () => {
+        totalHeight = 0;
+        items.forEach((item) => {
+          // 16px = 1rem
+          totalHeight += item.offsetHeight + 16;
+        });
+        setBeltHeight(totalHeight / 3);
+      };
+      calculateHeights();
+      //stackoverflow magic to fix resizing
+      window.addEventListener("resize", calculateHeights);
+      //load images
+      setTimeout(calculateHeights, 500);
+      return () => {
+        window.removeEventListener("resize", calculateHeights);
+      };
+    }, []);
+    useEffect(() => {
+      const belt = beltRef.current;
+      if (!belt || beltHeight === 0) return;
+      let animationId;
+      let position = 0;
+      const speed = scrollSpeed; // ppf (pixels/frame)
+      const scroll = () => {
+        position -= speed;
+        //create infinite loop
+        if (position <= -beltHeight) {
+          position += beltHeight;
+        }
+        belt.style.transform = `translateY(${position}px)`;
+        animationId = requestAnimationFrame(scroll);
+      };
+      animationId = requestAnimationFrame(scroll);
+      return () => {
+        cancelAnimationFrame(animationId);
+      };
+    }, [beltHeight, scrollSpeed]);
+    return (
+      <div className={className}>
+        <div className="relative h-full w-full overflow-hidden">
+          <div
+            ref={beltRef}
+            className="absolute flex flex-col left-0 gap-4 will-change-transform p-0"
+          >
+            {extendedImages.map((image, index) => (
+              <div
+                key={`${image.id}-${index}`}
+                className="flex-shrink-0 overflow-hidden shadow-lg"
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="h-50 w-40 object-cover block p-0"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
   return (
     <div className="min-h-screen p-10 bg-cyan-700 text-slate-100">
       <div className="max-w-6xl mx-auto">
@@ -213,7 +314,18 @@ export default function Home() {
             </div>
           </div>
         )}
-
+          <VerticalScrollingImageBelt
+          className={
+            "fixed left-25 top-0 bottom-0 w-35 overflow-hidden h-screen"
+          }
+          scrollSpeed={0.5}
+        />
+        <VerticalScrollingImageBelt
+          className={
+            "fixed right-25 top-0 bottom-0 w-35 overflow-hidden h-screen"
+          }
+          scrollSpeed={0.51}
+        />
         {storedMovies.length > 0 && (
           <div className="mt-8">
             <h2 className="text-xl font-bold mb-4">
@@ -227,6 +339,7 @@ export default function Home() {
           </div>
         )}
       </div>
+      
     </div>
   );
 }
