@@ -60,7 +60,7 @@ export default function Home() {
   };
 
   const MovieCard = ({ movie }) => (
-    <div className="group bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105 hover:shadow-xl relative z-10 hover:z-20">
+    <div className="group bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-130 hover:shadow-xl relative z-10 hover:z-20">
       <div className="relative">
         {movie.rated && (
           <span className="absolute top-16 right-2 bg-black/60 px-2 py-1 rounded text-xs font-medium">
@@ -213,32 +213,64 @@ export default function Home() {
       </div>
     );
   };
+
+  const HoverRevealInstructions = () => {
+    const [isHovering, setIsHovering] = useState(false);
+
+    const handleMouseEnter = () => {
+      setIsHovering(true);
+    };
+
+    const handleMouseLeave = () => {
+      setIsHovering(false);
+    };
+
+    return (
+      <div
+        className="relative w-full h-64 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-300 mt-25"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {!isHovering && (
+          <p className="text-white-500 text-center pt-50">
+            Hover here to see instructions
+          </p>
+        )}
+
+        {isHovering && (
+          <div className="absolute inset-0 p-6 transition-opacity duration-300 ease-in-out pt-40">
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-center mb-2">
+                Step 1: Add Movies
+              </h2>
+              <p className="font-bold text-center mb-4">
+                Type in a movie title. Click the Save my Movies button and we
+                will search for and store the movies with related titles.
+              </p>
+            </div>
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-center mb-2">
+                Step 2: Get Recommendations
+              </h2>
+              <p className="font-bold text-center mb-4">
+                When you want to make your choice, type in what your in the mood
+                for, genre, year, or even just a key word and get your
+                personalized recommendation!
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen p-10 bg-cyan-700 text-slate-100">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-center">
-          🎬 Movie Recommendation Library
+        <h1 className="text-6xl font-bold mb-6 text-center">
+          🎬 My Movie Recommendation Library
         </h1>
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-center mb-2">
-            Step 1: Add Movies
-          </h2>
-          <p className="font-bold text-center mb-4">
-            Type in a movie title. Click the Save my Movies button and we will
-            search for and store the movies with related titles.
-          </p>
-        </div>
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-center mb-2">
-            Step 2: Get Recommendations
-          </h2>
-          {/* // eslint-disable-next-line react/no-unescaped-entities */}
-          <p className="font-bold text-center mb-4">
-            When you want to make your choice, type in what your in the mood
-            for, genre, year, or even just a key word and get your personalized
-            recommendation!
-          </p>
-        </div>
+
         <div className="max-w-md mx-auto mb-8">
           <div className="flex gap-4 mb-4">
             <input
@@ -314,7 +346,8 @@ export default function Home() {
             </div>
           </div>
         )}
-          <VerticalScrollingImageBelt
+
+        <VerticalScrollingImageBelt
           className={
             "fixed left-25 top-0 bottom-0 w-35 overflow-hidden h-screen"
           }
@@ -338,8 +371,8 @@ export default function Home() {
             </div>
           </div>
         )}
+        <HoverRevealInstructions />
       </div>
-      
     </div>
   );
 }
