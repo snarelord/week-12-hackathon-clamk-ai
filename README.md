@@ -2,11 +2,6 @@
 
 🎬 A Movie Recommendations Library built with Next.js, Pinecone, and OpenAI embeddings that provides personalised movie suggestions based on user input.
 
-## Table of Contents
-
-- [Features](#features)
-- [Tech](#tech)
-
 ## Features
 
 - Input a movie title or description to receive similar movie recommendations.
