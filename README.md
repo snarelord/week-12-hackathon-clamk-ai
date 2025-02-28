@@ -6,10 +6,6 @@
 
 - [Features](#features)
 - [Tech](#tech)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
 
 ## Features
 
@@ -26,16 +22,4 @@
 - [OMDb API](http://www.omdbapi.com/)
 - [React](https://reactjs.org/)
 
-## Installation
 
-1. Clone the repository:
-
-   ```bash
-   git clone
-   ```
-
-## Usage
-
-## API Endpoints
-
-## Contributing
